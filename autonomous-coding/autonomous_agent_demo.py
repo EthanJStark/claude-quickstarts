@@ -14,14 +14,14 @@ Example Usage:
 
 import argparse
 import asyncio
-import os
 from pathlib import Path
 
 from agent import run_autonomous_agent
+from client import get_default_model
 
 
 # Configuration
-DEFAULT_MODEL = "claude-sonnet-4-5-20250929"
+DEFAULT_MODEL = get_default_model()
 
 
 def parse_args() -> argparse.Namespace:
@@ -35,7 +35,7 @@ Examples:
   python autonomous_agent_demo.py --project-dir ./claude_clone
 
   # Use a specific model
-  python autonomous_agent_demo.py --project-dir ./claude_clone --model claude-sonnet-4-5-20250929
+  python autonomous_agent_demo.py --project-dir ./claude_clone --model us.anthropic.claude-sonnet-4-5-20250929-v1:0
 
   # Limit iterations for testing
   python autonomous_agent_demo.py --project-dir ./claude_clone --max-iterations 5
