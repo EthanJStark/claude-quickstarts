@@ -4,7 +4,9 @@ Claude Quickstarts is a collection of projects designed to help developers quick
 
 ## Getting Started
 
-To use these quickstarts, you'll need an Claude API key. If you don't have one yet, you can sign up for free at [console.anthropic.com](https://console.anthropic.com).
+To use these quickstarts, you'll need access to Claude via one of these methods:
+- **Anthropic API Key**: Sign up at [console.anthropic.com](https://console.anthropic.com)
+- **AWS Bedrock**: Use Claude models through Amazon Bedrock (supported by autonomous-coding quickstart)
 
 ## Available Quickstarts
 
@@ -39,7 +41,7 @@ Each quickstart project comes with its own README and setup instructions. Genera
 1. Clone this repository
 2. Navigate to the specific quickstart directory
 3. Install the required dependencies
-4. Set up your Claude API key as an environment variable
+4. Configure authentication (API key or AWS Bedrock - see specific quickstart docs)
 5. Run the quickstart application
 
 ## Explore Further
