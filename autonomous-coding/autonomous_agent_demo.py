@@ -44,7 +44,14 @@ Examples:
   python autonomous_agent_demo.py --project-dir ./claude_clone
 
 Environment Variables:
-  ANTHROPIC_API_KEY    Your Anthropic API key (required)
+  ANTHROPIC_API_KEY    Your Anthropic API key (optional if using Bedrock)
+
+Authentication:
+  The agent uses Claude Code CLI for authentication, which supports:
+  - ANTHROPIC_API_KEY environment variable
+  - AWS Bedrock via ~/.claude/settings.json
+
+  See README.md for Bedrock setup instructions.
         """,
     )
 
@@ -75,14 +82,6 @@ Environment Variables:
 def main() -> None:
     """Main entry point."""
     args = parse_args()
-
-    # Check for API key
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        print("Error: ANTHROPIC_API_KEY environment variable not set")
-        print("\nGet your API key from: https://console.anthropic.com/")
-        print("\nThen set it:")
-        print("  export ANTHROPIC_API_KEY='your-api-key-here'")
-        return
 
     # Automatically place projects in generations/ directory unless already specified
     project_dir = args.project_dir

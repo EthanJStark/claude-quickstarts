@@ -20,9 +20,17 @@ claude --version  # Should be latest version
 pip show claude-code-sdk  # Check SDK is installed
 ```
 
-**API Key:** Set your Anthropic API key:
+**Authentication:** Configure authentication (choose one method):
+
 ```bash
+# Option 1: Anthropic API Key
 export ANTHROPIC_API_KEY='your-api-key-here'
+
+# Option 2: AWS Bedrock (via Claude Code config)
+# Ensure ~/.claude/settings.json has:
+# - awsCredentialExport: path to AWS credential script
+# - CLAUDE_CODE_USE_BEDROCK=1
+# - Bedrock model IDs
 ```
 
 ## Quick Start
@@ -47,6 +55,76 @@ python autonomous_agent_demo.py --project-dir ./my_project --max-iterations 3
 - **Full app:** Building all 200 features typically requires **many hours** of total runtime across multiple sessions.
 
 **Tip:** The 200 features parameter in the prompts is designed for comprehensive coverage. If you want faster demos, you can modify `prompts/initializer_prompt.md` to reduce the feature count (e.g., 20-50 features for a quicker demo).
+
+## Authentication Methods
+
+The autonomous agent supports two authentication methods via Claude Code CLI:
+
+### 1. Anthropic API Key (Default)
+
+Set the `ANTHROPIC_API_KEY` environment variable:
+
+```bash
+export ANTHROPIC_API_KEY='your-api-key-here'
+```
+
+Get your API key from: https://console.anthropic.com/
+
+### 2. AWS Bedrock
+
+Configure `~/.claude/settings.json` with Bedrock settings:
+
+```json
+{
+  "awsCredentialExport": "/path/to/aws-credential-script.sh",
+  "env": {
+    "CLAUDE_CODE_USE_BEDROCK": "1",
+    "AWS_REGION": "us-west-2"
+  }
+}
+```
+
+Requirements:
+- AWS credentials configured (via AWS SSO or IAM)
+- Access to Claude models in Amazon Bedrock
+- Credential export script that outputs AWS STS credentials
+
+Example credential script (`generate_aws_claude_grant.sh`):
+```bash
+#!/bin/bash
+PROFILE="your-aws-profile"
+
+# Refresh credentials if expired
+aws sts get-caller-identity --profile "$PROFILE" &>/dev/null
+if [ $? -ne 0 ]; then
+    aws sso login --profile "$PROFILE" >&2
+fi
+
+# Export credentials in STS format
+CREDS=$(aws configure export-credentials --profile "$PROFILE" --format env-no-export 2>/dev/null)
+eval "$CREDS"
+
+cat <<EOF
+{
+  "Credentials": {
+    "AccessKeyId": "$AWS_ACCESS_KEY_ID",
+    "SecretAccessKey": "$AWS_SECRET_ACCESS_KEY",
+    "SessionToken": "$AWS_SESSION_TOKEN"
+  }
+}
+EOF
+```
+
+Make the script executable:
+```bash
+chmod +x /path/to/generate_aws_claude_grant.sh
+```
+
+**Note:** Use Bedrock model IDs when using Bedrock authentication:
+- Regional: `us.anthropic.claude-sonnet-4-5-20250929-v1:0`
+- Global: `global.anthropic.claude-sonnet-4-5-20250929-v1:0`
+
+See [Claude on Amazon Bedrock](https://docs.anthropic.com/en/api/claude-on-amazon-bedrock) for details.
 
 ## How It Works
 
@@ -155,8 +233,18 @@ This is normal. The initializer agent is generating 200 detailed test cases, whi
 **"Command blocked by security hook"**
 The agent tried to run a command not in the allowlist. This is the security system working as intended. If needed, add the command to `ALLOWED_COMMANDS` in `security.py`.
 
-**"API key not set"**
-Ensure `ANTHROPIC_API_KEY` is exported in your shell environment.
+**"Authentication failed"**
+Check that you have configured authentication:
+- Option 1: Set `ANTHROPIC_API_KEY` environment variable
+- Option 2: Configure AWS Bedrock in `~/.claude/settings.json`
+For Bedrock, ensure your AWS credentials are valid:
+```bash
+aws sts get-caller-identity --profile your-profile
+```
+Check Claude Code CLI can authenticate:
+```bash
+claude --version
+```
 
 ## License
 
