@@ -3,3 +3,10 @@ generations/
 
 # Log files
 logs/
+
+# Local virtualenv
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
