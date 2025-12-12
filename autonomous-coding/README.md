@@ -4,20 +4,24 @@ A minimal harness demonstrating long-running autonomous coding with the Claude A
 
 ## Prerequisites
 
-**Required:** Install the latest versions of both Claude Code and the Claude Agent SDK:
+**Required:** Install the latest versions of both Claude Code and the Claude Agent SDK.
 
 ```bash
 # Install Claude Code CLI (latest version required)
 npm install -g @anthropic-ai/claude-code
 
-# Install Python dependencies
-pip install -r requirements.txt
+# Create a local virtualenv (recommended; required on many macOS/Homebrew setups)
+python -m venv .venv
+
+# Install Python dependencies into the virtualenv
+./.venv/bin/python -m pip install -r requirements.txt
 ```
 
 Verify your installations:
+
 ```bash
 claude --version  # Should be latest version
-pip show claude-code-sdk  # Check SDK is installed
+./.venv/bin/python -m pip show claude-code-sdk  # Check SDK is installed
 ```
 
 **Authentication:** Configure authentication (choose one method):
@@ -36,12 +40,13 @@ export ANTHROPIC_API_KEY='your-api-key-here'
 ## Quick Start
 
 ```bash
-python autonomous_agent_demo.py --project-dir ./my_project
+./.venv/bin/python autonomous_agent_demo.py --project-dir ./my_project
 ```
 
 For testing with limited iterations:
+
 ```bash
-python autonomous_agent_demo.py --project-dir ./my_project --max-iterations 3
+./.venv/bin/python autonomous_agent_demo.py --project-dir ./my_project --max-iterations 3
 ```
 
 ## Important Timing Expectations
@@ -68,7 +73,7 @@ Set the `ANTHROPIC_API_KEY` environment variable:
 export ANTHROPIC_API_KEY='your-api-key-here'
 ```
 
-Get your API key from: https://console.anthropic.com/
+Get your API key from: [Anthropic Console](https://console.anthropic.com/)
 
 ### 2. AWS Bedrock
 
@@ -85,11 +90,13 @@ Configure `~/.claude/settings.json` with Bedrock settings:
 ```
 
 Requirements:
+
 - AWS credentials configured (via AWS SSO or IAM)
 - Access to Claude models in Amazon Bedrock
 - Credential export script that outputs AWS STS credentials
 
 Example credential script (`generate_aws_claude_grant.sh`):
+
 ```bash
 #!/bin/bash
 PROFILE="your-aws-profile"
@@ -116,15 +123,31 @@ EOF
 ```
 
 Make the script executable:
+
 ```bash
 chmod +x /path/to/generate_aws_claude_grant.sh
 ```
 
 **Note:** Use Bedrock model IDs when using Bedrock authentication:
+
 - Regional: `us.anthropic.claude-sonnet-4-5-20250929-v1:0`
 - Global: `global.anthropic.claude-sonnet-4-5-20250929-v1:0`
 
 See [Claude on Amazon Bedrock](https://docs.anthropic.com/en/api/claude-on-amazon-bedrock) for details.
+
+## Model Selection (Anthropic API vs Bedrock)
+
+This harness uses Claude Code CLI for authentication and model routing.
+
+- If `CLAUDE_CODE_USE_BEDROCK=1` is set (in your environment or in `~/.claude/settings.json` under `env`), the harness will default to the Bedrock model ID from `ANTHROPIC_MODEL` (or `ANTHROPIC_DEFAULT_SONNET_MODEL`).
+- In Bedrock mode, if you pass a short name like `--model claude-sonnet-4-5-20250929`, the harness will automatically map it to your configured Bedrock model ID (Sonnet/Haiku/Opus).
+- If you have an environment-specific suffix in your Bedrock model ID (e.g. bracketed selectors), the harness passes it through as-is.
+
+If you have model IDs polluted by copy/pasted formatting, you can opt-in to stripping bracketed ANSI-like suffixes:
+
+```bash
+export AUTONOMOUS_CODING_STRIP_BRACKETED_MODEL_SUFFIX=1
+```
 
 ## How It Works
 
@@ -205,11 +228,11 @@ The application will typically be available at `http://localhost:3000` or simila
 
 ## Command Line Options
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--project-dir` | Directory for the project | `./autonomous_demo_project` |
-| `--max-iterations` | Max agent iterations | Unlimited |
-| `--model` | Claude model to use | `claude-sonnet-4-5-20250929` |
+| Option             | Description               | Default                                                                                                        |
+| ------------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `--project-dir`    | Directory for the project | `./autonomous_demo_project`                                                                                    |
+| `--max-iterations` | Max agent iterations      | Unlimited                                                                                                      |
+| `--model`          | Claude model to use       | `claude-sonnet-4-5-20250929` (or `ANTHROPIC_MODEL` / `ANTHROPIC_DEFAULT_SONNET_MODEL` when Bedrock is enabled) |
 
 ## Customization
 
@@ -235,13 +258,17 @@ The agent tried to run a command not in the allowlist. This is the security syst
 
 **"Authentication failed"**
 Check that you have configured authentication:
+
 - Option 1: Set `ANTHROPIC_API_KEY` environment variable
 - Option 2: Configure AWS Bedrock in `~/.claude/settings.json`
-For Bedrock, ensure your AWS credentials are valid:
+  For Bedrock, ensure your AWS credentials are valid:
+
 ```bash
 aws sts get-caller-identity --profile your-profile
 ```
+
 Check Claude Code CLI can authenticate:
+
 ```bash
 claude --version
 ```

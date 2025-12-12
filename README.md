@@ -1,10 +1,11 @@
 # Claude Quickstarts
 
-Claude Quickstarts is a collection of projects designed to help developers quickly get started with building  applications using the Claude API. Each quickstart provides a foundation that you can easily build upon and customize for your specific needs.
+Claude Quickstarts is a collection of projects designed to help developers quickly get started with building applications using the Claude API. Each quickstart provides a foundation that you can easily build upon and customize for your specific needs.
 
 ## Getting Started
 
 To use these quickstarts, you'll need access to Claude via one of these methods:
+
 - **Anthropic API Key**: Sign up at [console.anthropic.com](https://console.anthropic.com)
 - **AWS Bedrock**: Use Claude models through Amazon Bedrock (supported by autonomous-coding quickstart)
 
@@ -31,6 +32,8 @@ An environment and tools that Claude can use to control a desktop computer. This
 ### Autonomous Coding Agent
 
 An autonomous coding agent powered by the Claude Agent SDK. This project demonstrates a two-agent pattern (initializer + coding agent) that can build complete applications over multiple sessions, with progress persisted via git and a feature list that the agent works through incrementally.
+
+Note: This quickstart is Python-based; on many macOS/Homebrew setups you’ll want to follow its README and use a local virtualenv (`.venv`) for dependencies.
 
 [Go to Autonomous Coding Agent Quickstart](./autonomous-coding)
 
